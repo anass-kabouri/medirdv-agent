@@ -1,0 +1,28 @@
+﻿# Environnement
+backend/.env
+*.env
+!.env.example
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Node / React
+node_modules/
+frontend/build/
+frontend/dist/
+
+# Docker
+postgres_data/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+
+# Logo prive (ne pas exposer publiquement)
+backend/app/static/logo.png
