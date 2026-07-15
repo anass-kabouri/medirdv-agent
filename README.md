@@ -1,14 +1,4 @@
-Parfait, voici la marche à suivre :
-
-Ouvre le fichier dans VS Code :
-
-powershellcode README.md
-
-Sélectionne tout (Ctrl+A) et supprime le contenu existant
-Colle le contenu ci-dessous (copie tout le bloc, du # MediRDV Agent jusqu'à la toute dernière ligne)
-Sauvegarde (Ctrl+S)
-
-markdown# MediRDV Agent 🩺🤖
+# MediRDV Agent 🩺🤖
 
 Assistant conversationnel de prise de rendez-vous médicaux, propulsé par un
 agent IA (Claude + LangChain avec function calling), avec espace patient et
@@ -38,9 +28,11 @@ dashboard administrateur.
 - 📅 Empêche le double-booking au niveau base de données
 
 **Comptes et sécurité**
-- 📝 Inscription patient avec vérification d'email par code à 6 chiffres
+- 📝 Inscription patient (via l'interface web, bouton "Mon compte") avec
+  vérification d'email par code à 6 chiffres
 - 🔐 Connexion (JWT), mots de passe hashés (bcrypt)
-- 👤 Espace patient : consultation de son propre historique de rendez-vous
+- 👤 Espace patient dédié ("Mes rendez-vous") pour consulter son propre
+  historique une fois connecté
 - 🛡️ Compte admin séparé (rôle dédié), routes protégées
 
 **Notifications**
@@ -73,8 +65,9 @@ dashboard administrateur.
 │  (Anthropic) │
 └──────────────┘
 
-Le frontend propose deux espaces : le **chat patient** (accessible à tous,
-compte optionnel) et l'**espace admin** (connexion requise, rôle admin).
+Le frontend propose trois espaces : le **chat patient** (accessible à tous,
+compte optionnel), l'**espace patient** ("Mon compte" : inscription,
+connexion, historique) et l'**espace admin** (connexion requise, rôle admin).
 
 ## Stack technique
 
@@ -99,6 +92,7 @@ langchain-anthropic (Claude), APScheduler, bcrypt, PyJWT, ReportLab, pytest
    git clone <url-du-repo>
    cd medirdv-agent
    cp backend/.env.example backend/.env
+   cp frontend/.env.example frontend/.env
 ```
 
 2. **Éditer `backend/.env`**
@@ -145,9 +139,18 @@ de le demander en langage naturel dans la même conversation.
 
 ### Créer un compte patient (optionnel)
 
-`POST /auth/register` → réception d'un code à 6 chiffres par email →
-`POST /auth/verify` → `POST /auth/login` pour obtenir un token JWT →
-`GET /appointments/me` pour consulter son propre historique.
+Depuis l'interface (http://localhost:5173), clique sur **"Mon compte"** en
+haut à droite du chat :
+
+1. Onglet **"S'inscrire"** : nom, email, mot de passe
+2. Un code à 6 chiffres est envoyé par email → à saisir sur l'écran de
+   vérification qui s'affiche automatiquement
+3. Une fois vérifié, connecte-toi via l'onglet **"Se connecter"**
+4. Tu arrives sur **"Mes rendez-vous"**, qui liste automatiquement tous les
+   RDV pris avec cette adresse email (via le chat ou autrement)
+
+Équivalent en API directe : `POST /auth/register` → `POST /auth/verify` →
+`POST /auth/login` (récupère un token JWT) → `GET /appointments/me`.
 
 ### Endpoints principaux
 
@@ -226,7 +229,9 @@ medirdv-agent/
 │       ├── components/
 │       │   ├── ChatView.jsx
 │       │   ├── AdminLogin.jsx
-│       │   └── AdminDashboard.jsx
+│       │   ├── AdminDashboard.jsx
+│       │   ├── PatientAuth.jsx
+│       │   └── PatientDashboard.jsx
 │       └── App.jsx
 └── docker-compose.yml
 

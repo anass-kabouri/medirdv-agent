@@ -10,7 +10,7 @@ const WELCOME_MESSAGE = {
     "souhaitez un rendez-vous, et je m'occupe du reste.",
 };
 
-function ChatView({ onGoToAdmin }) {
+function ChatView({ onGoToAdmin, onGoToPatientAccount }) {
   const [messages, setMessages] = useState([WELCOME_MESSAGE]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -64,9 +64,14 @@ function ChatView({ onGoToAdmin }) {
           <h1>MediRDV</h1>
           <p>Assistant de prise de rendez-vous</p>
         </div>
-        <button className="admin-link" onClick={onGoToAdmin}>
-          Espace admin
-        </button>
+        <div className="header-actions">
+          <button className="admin-link" onClick={onGoToPatientAccount}>
+            Mon compte
+          </button>
+          <button className="admin-link" onClick={onGoToAdmin}>
+            Espace admin
+          </button>
+        </div>
       </header>
 
       <main className="chat-window">
