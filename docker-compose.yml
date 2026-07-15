@@ -48,5 +48,19 @@ services:
     depends_on:
       - db
 
+  nginx:
+    image: nginx:alpine
+    container_name: medirdv_nginx
+    profiles: ["https"]
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/certs:/etc/nginx/certs:ro
+    depends_on:
+      - backend
+      - frontend
+
 volumes:
   postgres_data:

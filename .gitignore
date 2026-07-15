@@ -26,3 +26,6 @@ postgres_data/
 
 # Logo prive (ne pas exposer publiquement)
 backend/app/static/logo.png
+
+# Certificats TLS (nginx) - ne jamais committer, meme auto-signes
+nginx/certs/*.pem
