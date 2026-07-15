@@ -73,6 +73,7 @@ function ChatView({ onGoToAdmin, onGoToPatientAccount }) {
           </button>
         </div>
       </header>
+      <div className="scallop-divider" />
 
       <main className="chat-window">
         {messages.map((msg, i) => (

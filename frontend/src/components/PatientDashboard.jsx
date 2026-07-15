@@ -46,6 +46,7 @@ function PatientDashboard({ token, onLogout, onBackToChat }) {
           </button>
         </div>
       </header>
+      <div className="scallop-divider" />
 
       {error && <div className="error-banner">{error}</div>}
 

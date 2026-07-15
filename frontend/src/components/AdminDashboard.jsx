@@ -80,6 +80,7 @@ function AdminDashboard({ token, onLogout }) {
           Deconnexion
         </button>
       </header>
+      <div className="scallop-divider" />
 
       {error && <div className="error-banner">{error}</div>}
 
