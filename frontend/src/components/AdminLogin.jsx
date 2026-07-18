@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+const CLINIC_NAME_LOGIN = import.meta.env.VITE_CLINIC_NAME || "MediRDV";
+
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 function AdminLogin({ onLoginSuccess, onBackToChat }) {
@@ -7,6 +9,7 @@ function AdminLogin({ onLoginSuccess, onBackToChat }) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [logoFailed, setLogoFailed] = useState(false);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -42,8 +45,16 @@ function AdminLogin({ onLoginSuccess, onBackToChat }) {
   return (
     <div className="admin-login-page">
       <form className="admin-login-card" onSubmit={handleSubmit}>
+        {!logoFailed && (
+          <img
+            src="/logo-akdital.png"
+            alt={CLINIC_NAME_LOGIN}
+            className="brand-logo-card"
+            onError={() => setLogoFailed(true)}
+          />
+        )}
         <h1>Espace admin</h1>
-        <p className="admin-login-subtitle">MediRDV - Tableau de bord</p>
+        <p className="admin-login-subtitle">{CLINIC_NAME_LOGIN} - Tableau de bord</p>
 
         <label>
           Email

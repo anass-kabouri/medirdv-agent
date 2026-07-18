@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+const CLINIC_NAME = import.meta.env.VITE_CLINIC_NAME || "MediRDV";
 
 const WELCOME_MESSAGE = {
   role: "assistant",
   content:
-    "Bonjour ! Je suis l'assistant de prise de rendez-vous de MediRDV. " +
+    `Bonjour ! Je suis l'assistant de prise de rendez-vous de ${CLINIC_NAME}. ` +
     "Dites-moi quel type de praticien vous cherchez, ou pour quand vous " +
     "souhaitez un rendez-vous, et je m'occupe du reste.",
 };
@@ -15,6 +16,7 @@ function ChatView({ onGoToAdmin, onGoToPatientAccount }) {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [logoFailed, setLogoFailed] = useState(false);
   const scrollRef = useRef(null);
 
   useEffect(() => {
@@ -46,12 +48,8 @@ function ChatView({ onGoToAdmin, onGoToPatientAccount }) {
       const data = await response.json();
       setMessages([...nextMessages, { role: "assistant", content: data.reply }]);
     } catch (err) {
-      setError(
-        "Impossible de contacter l'assistant. Verifie que le backend tourne bien sur " +
-          API_URL +
-          "."
-      );
-      console.error(err);
+      setError("Impossible de contacter l'assistant pour le moment. Veuillez reessayer.");
+      console.error("Erreur de connexion a l'API :", err);
     } finally {
       setIsLoading(false);
     }
@@ -60,9 +58,19 @@ function ChatView({ onGoToAdmin, onGoToPatientAccount }) {
   return (
     <div className="app">
       <header className="app-header">
-        <div>
-          <h1>MediRDV</h1>
-          <p>Assistant de prise de rendez-vous</p>
+        <div className="brand-block">
+          {!logoFailed && (
+            <img
+              src="/logo-akdital.png"
+              alt={CLINIC_NAME}
+              className="brand-logo"
+              onError={() => setLogoFailed(true)}
+            />
+          )}
+          <div>
+            <h1>{CLINIC_NAME}</h1>
+            <p>Assistant de prise de rendez-vous</p>
+          </div>
         </div>
         <div className="header-actions">
           <button className="admin-link" onClick={onGoToPatientAccount}>

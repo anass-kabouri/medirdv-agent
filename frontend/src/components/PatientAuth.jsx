@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+const CLINIC_NAME_PATIENT = import.meta.env.VITE_CLINIC_NAME || "MediRDV";
 
 function PatientAuth({ onLoginSuccess, onBackToChat }) {
   const [mode, setMode] = useState("login");
@@ -11,6 +12,7 @@ function PatientAuth({ onLoginSuccess, onBackToChat }) {
   const [error, setError] = useState(null);
   const [info, setInfo] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [logoFailed, setLogoFailed] = useState(false);
 
   async function handleLogin(e) {
     e.preventDefault();
@@ -95,8 +97,16 @@ function PatientAuth({ onLoginSuccess, onBackToChat }) {
   return (
     <div className="admin-login-page">
       <div className="admin-login-card">
+        {!logoFailed && (
+          <img
+            src="/logo-akdital.png"
+            alt={CLINIC_NAME_PATIENT}
+            className="brand-logo-card"
+            onError={() => setLogoFailed(true)}
+          />
+        )}
         <h1>{mode === "verify" ? "Verification" : "Mon compte"}</h1>
-        <p className="admin-login-subtitle">MediRDV - Espace patient</p>
+        <p className="admin-login-subtitle">{CLINIC_NAME_PATIENT} - Espace patient</p>
 
         {mode !== "verify" && (
           <div className="auth-tabs">

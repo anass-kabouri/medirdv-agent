@@ -29,3 +29,6 @@ backend/app/static/logo.png
 
 # Certificats TLS (nginx) - ne jamais committer, meme auto-signes
 nginx/certs/*.pem
+
+# Logo frontend prive (ne pas exposer publiquement)
+frontend/public/logo-akdital.png

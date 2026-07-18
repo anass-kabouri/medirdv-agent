@@ -1,6 +1,25 @@
 import { useEffect, useState } from "react";
+import { Line } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Tooltip,
+  Filler,
+} from "chart.js";
+
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Filler);
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+
+function friendlyErrorMessage(err) {
+  if (err instanceof TypeError) {
+    return "Connexion au serveur impossible. Veuillez reessayer.";
+  }
+  return err.message || "Une erreur est survenue.";
+}
 
 function AdminDashboard({ token, onLogout }) {
   const [stats, setStats] = useState(null);
@@ -33,7 +52,8 @@ function AdminDashboard({ token, onLogout }) {
         setStats(await statsRes.json());
         setAppointments(await appointmentsRes.json());
       } catch (err) {
-        setError(err.message);
+        setError(friendlyErrorMessage(err));
+        console.error(err);
       } finally {
         setIsLoading(false);
       }
@@ -60,7 +80,8 @@ function AdminDashboard({ token, onLogout }) {
       link.click();
       window.URL.revokeObjectURL(url);
     } catch (err) {
-      setError(err.message);
+      setError(friendlyErrorMessage(err));
+      console.error(err);
     }
   }
 
@@ -68,9 +89,53 @@ function AdminDashboard({ token, onLogout }) {
     return <div className="admin-dashboard-loading">Chargement du dashboard...</div>;
   }
 
-  const maxDailyCount = stats
-    ? Math.max(1, ...stats.appointments_last_7_days.map((d) => d.count))
-    : 1;
+  const chartData = stats && {
+    labels: stats.appointments_last_7_days.map((d) => d.date.slice(5)),
+    datasets: [
+      {
+        label: "Rendez-vous",
+        data: stats.appointments_last_7_days.map((d) => d.count),
+        borderColor: "#0f75c2",
+        backgroundColor: "rgba(15, 117, 194, 0.12)",
+        pointBackgroundColor: "#0f75c2",
+        pointBorderColor: "#ffffff",
+        pointBorderWidth: 1.5,
+        pointRadius: 4,
+        pointHoverRadius: 6,
+        borderWidth: 2,
+        tension: 0.35,
+        fill: true,
+      },
+    ],
+  };
+
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: "#06467d",
+        padding: 10,
+        titleFont: { family: "IBM Plex Mono", size: 11 },
+        bodyFont: { family: "Inter", size: 12 },
+        callbacks: {
+          label: (ctx) => `${ctx.parsed.y} rendez-vous`,
+        },
+      },
+    },
+    scales: {
+      x: {
+        grid: { display: false },
+        ticks: { font: { family: "IBM Plex Mono", size: 10.5 }, color: "#4a6178" },
+      },
+      y: {
+        beginAtZero: true,
+        ticks: { precision: 0, font: { family: "Inter", size: 11 }, color: "#4a6178" },
+        grid: { color: "#eaf3fb" },
+      },
+    },
+  };
 
   return (
     <div className="admin-dashboard">
@@ -116,17 +181,8 @@ function AdminDashboard({ token, onLogout }) {
             {stats.appointments_last_7_days.length === 0 ? (
               <p className="empty-state">Aucune donnee sur cette periode.</p>
             ) : (
-              <div className="bar-chart">
-                {stats.appointments_last_7_days.map((day) => (
-                  <div className="bar-column" key={day.date}>
-                    <div
-                      className="bar"
-                      style={{ height: `${(day.count / maxDailyCount) * 100}%` }}
-                      title={`${day.count} rendez-vous`}
-                    />
-                    <span className="bar-label">{day.date.slice(5)}</span>
-                  </div>
-                ))}
+              <div style={{ height: "220px" }}>
+                <Line data={chartData} options={chartOptions} />
               </div>
             )}
           </section>

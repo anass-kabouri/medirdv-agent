@@ -31,6 +31,22 @@ Regles importantes :
 MAX_TOOL_ITERATIONS = 5
 
 
+def _extract_text(content) -> str:
+    if isinstance(content, str):
+        return content
+
+    if isinstance(content, list):
+        parts = []
+        for block in content:
+            if isinstance(block, dict) and block.get("type") == "text":
+                parts.append(block.get("text", ""))
+            elif isinstance(block, str):
+                parts.append(block)
+        return "".join(parts).strip()
+
+    return str(content)
+
+
 def run_agent(db: Session, history: list[dict]) -> str:
     tools = build_tools(db)
     tools_by_name = {t.name: t for t in tools}
@@ -52,7 +68,7 @@ def run_agent(db: Session, history: list[dict]) -> str:
         messages.append(response)
 
         if not response.tool_calls:
-            return response.content
+            return _extract_text(response.content)
 
         for tool_call in response.tool_calls:
             tool = tools_by_name.get(tool_call["name"])
